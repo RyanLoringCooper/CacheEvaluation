@@ -1,27 +1,40 @@
 CXX				= gcc
-CXXFLAGS		= -Wall -O2 
+LIBS			= -lm
+CXXFLAGS		= -Wall -O2 $(LIBS)
+PRG_SUFFIX		= .bin
+TEST_SUFFIX		= .test
 SRCS			= $(patsubst src/%.c, %.c, $(wildcard src/*.c))
+SRC_OBJS		= $(SRCS:.c=.o)
+PRGS			= $(patsubst %.c, %, $(SRCS))
+HEADERS			= $(patsubst src/headers/%.c, %.c, $(wildcard src/headers/*.c))
+HEADER_OBJS		= $(HEADERS:.c=.o)
 TESTS			= $(patsubst tests/%.c, %.c, $(wildcard tests/*.c))
-OBJS			= $(SRCS:.c=.o)
 TEST_OBJS		= $(TESTS:.c=.o)
+TEST_PRGS		= $(patsubst %.c, %, $(TESTS))
+BINS			= $(patsubst %, %$(PRG_SUFFIX), $(PRGS))
+TEST_BINS		= $(patsubst %, %$(TEST_SUFFIX), $(TEST_PRGS))
 OBJ_DIR			= obj/
 BUILD_DIR		= bin/
-VPATH			= tests src
+VPATH			= tests src src/headers
 
-all: tests srcs
-	@echo Compiled all targets
+.SECONDEXPANSION:
+BIN = $@
 
-srcs: $(OBJS) 
+all: srcs tests
+
+srcs: $(BINS)
+	@echo Compiled sources
+
+tests: $(TEST_BINS)
+	@echo Compiled tests
+
+%$(PRG_SUFFIX): $(SRC_OBJS)  $(HEADER_OBJS)
 	@mkdir -p $(BUILD_DIR)
-	@- $(foreach TEST,$(TESTS), \
-		$(CXX) $(CXXFLAGS) -o $(BUILD_DIR)$(TEST) $(patsubst %.o, $(OBJ_DIR)%.o, $(OBJS)) $(OBJ_DIR)$(TEST:.c=.o)\
-	)
+	$(CXX) $(CXXFLAGS) -o $(BUILD_DIR)$(BIN) $(patsubst %.o, $(OBJ_DIR)%.o, $(SRC_OBJS)) $(patsubst %.o, $(OBJ_DIR)%.o, $(HEADER_OBJS))
 
-tests: $(OBJS) $(TEST_OBJS)
+%$(TEST_SUFFIX): $(TEST_OBJS) $(HEADER_OBJS)
 	@mkdir -p $(BUILD_DIR)
-	@- $(foreach TEST,$(TESTS), \
-		$(CXX) $(CXXFLAGS) -o $(BUILD_DIR)$(TEST) $(patsubst %.o, $(OBJ_DIR)%.o, $(OBJS)) $(OBJ_DIR)$(TEST:.c=.o)\
-	)
+	$(CXX) $(CXXFLAGS) -o $(BUILD_DIR)$(BIN) $(patsubst %.o, $(OBJ_DIR)%.o, $(TEST_OBJS)) $(patsubst %.o, $(OBJ_DIR)%.o, $(HEADER_OBJS))
 
 clean: 
 	$(RM) -rf $(BUILD_DIR)

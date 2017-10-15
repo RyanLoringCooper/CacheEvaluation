@@ -18,3 +18,7 @@ void logInts(int *data, int arrayLength, char *filename) {
     }
     fclose(dfile);
 }
+
+int roughlyEqual(int a, int b) {
+    return abs(a-b) < ROUGHLY_EQUAL_THRESHOLD;
+}
