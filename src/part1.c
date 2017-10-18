@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 #include <tgmath.h>
 #include "headers/util.h"
@@ -6,6 +7,9 @@
 #define BUFF_SIZE 256*1024
 #define BUFF_INCREMENT 32
 #define EPOCHS 1000000
+
+// change this if you are not finding your L1 cache size
+#define L1_TIMEOUT 30
 
 char buff[BUFF_SIZE] = "";
 
@@ -40,16 +44,17 @@ int getCacheSize() {
 	    diff = clock() - start;
 	    avg += diff * 1000 / CLOCKS_PER_SEC;
 	}
-	if (prev_time != 0 && abs(avg/10 - prev_time) > 30) {
-            printf("Cache size:\t%dB = %gKB\n",
+	if (prev_time != 0 && abs(avg/10 - prev_time) > L1_TIMEOUT) {
+            printf("Cache size:\t%luB = %gKB\n",
                 test_size/2*sizeof(int),
 		pow(2,h-11)*sizeof(int));
 	    return test_size/2*sizeof(int);
 	}
-	printf("%d:\t%d ms\n",
+	printf("%lu:\t%d ms\n",
             test_size*sizeof(int), avg/10);
 	prev_time = avg/10;
     }
+    return -1;
 }
 
 int getLineSize() {

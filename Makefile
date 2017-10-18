@@ -1,6 +1,6 @@
 CXX				= gcc
 LIBS			= -lm
-CXXFLAGS		= -Wall -O0 $(LIBS)
+CXXFLAGS		= -Wall -O0 -Wno-unused-but-set-variable $(LIBS)
 PRG_SUFFIX		= .bin
 TEST_SUFFIX		= .test
 SRCS			= $(patsubst src/%.c, %.c, $(wildcard src/*.c))
