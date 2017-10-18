@@ -23,30 +23,33 @@ clock_t getMissTime() {
     return (end-start)/EPOCHS;
 }
 
-int getCacheSize(clock_t missTime) {
-    int i, j; 
-    char temp;
-    clock_t start, end, times[(int)log2(BUFF_SIZE)];
-    int limitReached = FALSE, cacheSize = 0, timeIndex = 0;
-    // make sure the first access is a hit, so that in the first 
-    // iteration of the loop, end-start is not roughly equal to the time
-    // a miss would take.
-    temp = buff[0];
-    for(i = 0; i < BUFF_SIZE && !limitReached; i *= 2) {
-        for(j = 0; j < i; j += BUFF_INCREMENT) {
-            temp = buff[j];
-        }
-        start = clock();
-        temp = buff[0];
-        end = clock();
-        times[timeIndex++] = end-start;
-        if(roughlyEqual(end-start, missTime)) {
-            cacheSize = i;
-            limitReached = TRUE;
-        }
+int getCacheSize() {
+    int h,i,j,k;
+    int prev_time = 0;
+    for (h=8; h<20; h++) {
+        int test_size = pow(2,h);
+	int avg = 0;
+	for (i=0; i<10; i++) {
+            clock_t start = clock(), diff;
+	    int arr[test_size];
+	    for (j=0; j<pow(2,28)/test_size; j++) {
+                for (k=0; k<test_size; k+=16) {
+                    arr[k] = k;
+		}
+	    }
+	    diff = clock() - start;
+	    avg += diff * 1000 / CLOCKS_PER_SEC;
+	}
+	if (prev_time != 0 && abs(avg/10 - prev_time) > 30) {
+            printf("Cache size:\t%dB = %gKB\n",
+                test_size/2*sizeof(int),
+		pow(2,h-11)*sizeof(int));
+	    return test_size/2*sizeof(int);
+	}
+	printf("%d:\t%d ms\n",
+            test_size*sizeof(int), avg/10);
+	prev_time = avg/10;
     }
-    logInts((int *) &times[0], (int)log2(cacheSize), "getCacheSizeTimes.log");
-    return cacheSize;
 }
 
 int getLineSize() {
@@ -61,8 +64,8 @@ int getAssociativity() {
 
 int main(int argc, char *argv[]) {
     int cacheSize, lineSize, associativity;
-    clock_t missTime = getMissTime();
-    cacheSize = getCacheSize(missTime);
+    //clock_t missTime = getMissTime();
+    cacheSize = getCacheSize();
     printf("Cache size: %d\n", cacheSize);
     lineSize = getLineSize();
     printf("Line size: %d\n", lineSize);
