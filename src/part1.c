@@ -85,9 +85,27 @@ int getLineSize(int cacheSize) {
     return 0;
 }
 
-int getAssociativity() {
+int getAssociativity(int cacheSize) {
     // TODO
-    return 0;
+    int h,i,j,k;
+    int prev_time = 0;
+    int temp;
+    for (h=8; h>0; h/=2) {
+        int avg = 0;
+        for (i=0; i<10; i++) {
+            int arr[cacheSize*2];
+            clock_t start = clock(), diff;
+            for (j=0; j<40000000; j++) {
+                for (k=0; k<h+1; k++) {
+                    arr[k*cacheSize/h] = k;
+                }
+            }
+            diff = clock() - start;
+            avg += diff * 1000 / CLOCKS_PER_SEC;
+        }
+        printf("%d:\t%d\n",h,avg/10/(h+1));
+    }
+    return 1;
 }
 
 int main(int argc, char *argv[]) {
@@ -97,6 +115,6 @@ int main(int argc, char *argv[]) {
     printf("Cache size: %d\n", cacheSize);
     lineSize = getLineSize(cacheSize);
     printf("Line size: %d\n", lineSize);
-    associativity = getAssociativity();
+    associativity = getAssociativity(cacheSize);
     printf("Associativity: %d\n", associativity);
 }
