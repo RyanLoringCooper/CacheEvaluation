@@ -1,5 +1,5 @@
 CXX				= gcc
-LIBS			= -lm
+LIBS			= -lm -lc
 CXXFLAGS		= -Wall -O0 -Wno-unused-but-set-variable $(LIBS)
 PRG_SUFFIX		= .bin
 TEST_SUFFIX		= .test

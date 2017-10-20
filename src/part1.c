@@ -12,26 +12,17 @@
 #define CACHE_SIZE_TIMEOUT 30
 #define LINE_SIZE_TIMEOUT 50
 
-char buff[BUFF_SIZE] = "";
+#define CACHE_H_START 8
+#define CACHE_H_STOP 20
 
-clock_t getMissTime() {
-    int i, j;
-    clock_t start, end;
-    char temp;
-    start = clock();
-    for(i = 0; i < EPOCHS; i++) {
-        for(j = 0; j < BUFF_SIZE; j += BUFF_INCREMENT) {
-            temp = buff[j];
-        }
-    }
-    end = clock();
-    return (end-start)/EPOCHS;
-}
+char buff[BUFF_SIZE] = "";
+char cacheSizeLogFile[] = "cacheSize.log";
 
 int getCacheSize() {
-    int h,i,j,k;
+    int h,i,j,k, timeIndex = 0, *aveTimes = (int *) malloc(sizeof(int)*CACHE_H_STOP-CACHE_H_START);
     int prev_time = 0;
-    for (h=8; h<20; h++) {
+    int retval = -1;
+    for (h=CACHE_H_START; h<CACHE_H_STOP; h++) {
         int test_size = pow(2,h);
         int avg = 0;
         for (i=0; i<10; i++) {
@@ -49,13 +40,21 @@ int getCacheSize() {
             printf("Cache size:\t%luB = %gKB\n",
                 test_size/2*sizeof(int),
                 pow(2,h-11)*sizeof(int));
-            return test_size/2*sizeof(int);
+            retval = test_size/2*sizeof(int);
+            break;
         }
-        printf("%lu:\t%d ms\n",
-            test_size*sizeof(int), avg/10);
         prev_time = avg/10;
+        printf("%lu:\t%d ms\n",
+            test_size*sizeof(int), prev_time);
+        aveTimes[timeIndex++] = prev_time;
     }
-    return -1;
+    
+    char temp[BUFF_INCREMENT] = ""; 
+    sprintf(temp, "%d", retval);
+    logStrings(cacheSizeLogFile, 3, "\nCache size ", temp, " Timings:");
+    logInts(cacheSizeLogFile, aveTimes, h-CACHE_H_START);
+    printf("Logged cache size timings to %s\n", cacheSizeLogFile);
+    return retval;
 }
 
 int getLineSize(int cacheSize) {
@@ -117,4 +116,5 @@ int main(int argc, char *argv[]) {
     printf("Line size: %d\n", lineSize);
     associativity = getAssociativity(cacheSize);
     printf("Associativity: %d\n", associativity);
+    return 0;
 }
