@@ -44,13 +44,13 @@ int getCacheSize() {
                 test_size/2*sizeof(int),
                 pow(2,h-11)*sizeof(int)); */
             retval = test_size/2*sizeof(int);
-            aveTimes[timeIndex++] = avg/10;
+            aveTimes[timeIndex] = avg/10;
             break;
         }
         prev_time = avg/10;
         printf("%lu:\t%d ms\n",
             test_size*sizeof(int), prev_time);
-        aveTimes[timeIndex] = prev_time;
+        aveTimes[timeIndex++] = prev_time;
     }
     
     char temp[BUFF_INCREMENT] = ""; 
