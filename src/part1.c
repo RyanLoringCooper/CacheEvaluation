@@ -102,7 +102,6 @@ int getLineSize(int cacheSize) {
 }
 
 int getAssociativity(int cacheSize) {
-    // TODO
     int aveTimeSize = (int)log2(MAX_ASS);
     int h,i,j,k, timeIndex = 0, *aveTimes = (int *) malloc(sizeof(int)*aveTimeSize);
     int prev_time = 0, retval = 1;
@@ -139,11 +138,11 @@ int getAssociativity(int cacheSize) {
 
 int main(int argc, char *argv[]) {
     int cacheSize, lineSize, associativity;
-    //clock_t missTime = getMissTime();
+    printf("Finding cache size...\n");
     cacheSize = getCacheSize();
-    printf("Cache size: %d\n", cacheSize);
+    printf("Cache size: %d\n\nFinding line size...\n", cacheSize);
     lineSize = getLineSize(cacheSize);
-    printf("Line size: %d\n", lineSize);
+    printf("Line size: %d\n\nFinding associativity...\n", lineSize);
     associativity = getAssociativity(cacheSize);
     printf("Associativity: %d\n", associativity);
     return 0;
