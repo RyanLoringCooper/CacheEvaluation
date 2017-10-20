@@ -16,10 +16,13 @@
 #define CACHE_H_STOP 20
 #define LINE_H_START 0 
 #define LINE_H_STOP 8
+#define MAX_ASS 32
+#define ASS_THRESH 50
 
 char buff[BUFF_SIZE] = "";
 char cacheSizeLogFile[] = "cacheSize.log";
 char lineSizeLogFile[] = "lineSize.log";
+char assLogFile[] = "associativity.log";
 
 int getCacheSize() {
     int h,i,j,k, timeIndex = 0, *aveTimes = (int *) malloc(sizeof(int)*(CACHE_H_STOP-CACHE_H_START));
@@ -100,9 +103,10 @@ int getLineSize(int cacheSize) {
 
 int getAssociativity(int cacheSize) {
     // TODO
-    int h,i,j,k;
-    //int prev_time = 0;
-    for (h=8; h>0; h/=2) {
+    int aveTimeSize = (int)log2(MAX_ASS);
+    int h,i,j,k, timeIndex = 0, *aveTimes = (int *) malloc(sizeof(int)*aveTimeSize);
+    int prev_time = 0, retval = 1;
+    for (h=MAX_ASS; h>0; h/=2) {
         int avg = 0;
         for (i=0; i<10; i++) {
             int arr[cacheSize*2];
@@ -115,9 +119,22 @@ int getAssociativity(int cacheSize) {
             diff = clock() - start;
             avg += diff * 1000 / CLOCKS_PER_SEC;
         }
-        printf("%d:\t%d\n",h,avg/10/(h+1));
+        prev_time = avg/10/(h+1);
+        aveTimes[timeIndex++] = prev_time;
+        printf("%d:\t%d\n",h,prev_time);
     }
-    return 1;
+    for(i = 2; i < aveTimeSize; i++) {
+       if(aveTimes[i-1]-aveTimes[i] < ASS_THRESH && aveTimes[i-2]-aveTimes[i-1] > ASS_THRESH) {
+            retval = MAX_ASS/pow(2,i-2);
+        }
+    }
+    char temp[BUFF_INCREMENT] = "";
+    sprintf(temp, "%d", retval);
+    logStrings(assLogFile, 3, "\nAssociativity ", temp, " Timings:");
+    logInts(assLogFile, aveTimes, aveTimeSize);
+    printf("Logged associativity to %s\n", assLogFile);
+    free(aveTimes);
+    return retval;
 }
 
 int main(int argc, char *argv[]) {
