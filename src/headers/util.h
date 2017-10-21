@@ -15,3 +15,7 @@ void logInts(char *filename, int *data, int arrayLength);
 int roughlyEqual(int a, int b);
 
 void logStrings(char *filename, int argc, ...);
+
+void print(int **arr, int rows, int columns, FILE *loc);
+
+int min(int a, int b);

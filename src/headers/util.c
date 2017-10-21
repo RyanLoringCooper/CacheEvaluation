@@ -40,3 +40,31 @@ void logStrings(char *filename, int argc, ...) {
     va_end(argv);
     fclose(dfile);
 }
+
+void print(int **arr, int rows, int columns, FILE *loc) {
+    int i, j;
+    fprintf(loc, "[");
+    for(i = 0; i < rows; i++) {
+        fprintf(loc, "[");
+        for(j = 0; j < columns; j++) {
+            fprintf(loc, "%d", arr[i][j]);
+            if(j != columns-1) {
+                fprintf(loc, ",\t");
+            }
+        }
+        fprintf(loc, "]");
+        if(i != rows-1) {
+            fprintf(loc, ",\n ");
+        } else {
+            fprintf(loc, "]\n");
+        }
+    }
+}
+
+int min(int a, int b) {
+    if(a < b) {
+        return a;
+    } else {
+        return b;
+    }
+}

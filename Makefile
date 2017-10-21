@@ -30,7 +30,7 @@ tests: $(TEST_BINS)
 
 %$(PRG_SUFFIX): $(SRC_OBJS)  $(HEADER_OBJS)
 	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -o $(BUILD_DIR)$(BIN) $(patsubst %.o, $(OBJ_DIR)%.o, $(SRC_OBJS)) $(patsubst %.o, $(OBJ_DIR)%.o, $(HEADER_OBJS))
+	$(CXX) $(CXXFLAGS) -o $(BUILD_DIR)$(BIN) $(patsubst %.o, $(OBJ_DIR)%.o, $(patsubst %$(PRG_SUFFIX), %.o, $@)) $(patsubst %.o, $(OBJ_DIR)%.o, $(HEADER_OBJS))
 
 %$(TEST_SUFFIX): $(TEST_OBJS) $(HEADER_OBJS)
 	@mkdir -p $(BUILD_DIR)
