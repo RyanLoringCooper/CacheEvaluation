@@ -34,7 +34,7 @@ tests: $(TEST_BINS)
 
 %$(TEST_SUFFIX): $(TEST_OBJS) $(HEADER_OBJS)
 	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -o $(BUILD_DIR)$(BIN) $(patsubst %.o, $(OBJ_DIR)%.o, $(TEST_OBJS)) $(patsubst %.o, $(OBJ_DIR)%.o, $(HEADER_OBJS))
+	$(CXX) $(CXXFLAGS) -o $(BUILD_DIR)$(BIN) $(patsubst %.o, $(OBJ_DIR)%.o, $(patsubst %$(TEST_SUFFIX), %.o, $@)) $(patsubst %.o, $(OBJ_DIR)%.o, $(HEADER_OBJS))
 
 clean: 
 	$(RM) -rf $(BUILD_DIR)
