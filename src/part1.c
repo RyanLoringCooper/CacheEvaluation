@@ -124,7 +124,7 @@ int getAssociativity(int cacheSize) {
     }
     for(i = 2; i < aveTimeSize; i++) {
        if(aveTimes[i-1]-aveTimes[i] < ASS_THRESH && aveTimes[i-2]-aveTimes[i-1] > ASS_THRESH) {
-            retval = MAX_ASS/pow(2,i-2);
+            retval = MAX_ASS/pow(2,i-1);
         }
     }
     char temp[BUFF_INCREMENT] = "";
